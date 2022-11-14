@@ -1,0 +1,59 @@
+# OTP Concurrency
+
+## GenServer
+
+An OTP server is a module with the `GenServer` behaviour that implements a set of callbacks
+
+A `GenServer` is a single "process" which runs a loop that handles one message per iteration passing along an updated state
+
+The minimum required set of callbacks for implementing `GenServer` behaviour, is the `init/1` function
+
+To link two processes together (such as the main App process and a developer defined function), we can define a `start_link` function which utilizes the `GenServer.start_link/3` function to spawn the process and return a `pid` for a program to use
+
+```elixir
+defmodule SimpleQueue do
+  use GenServer
+
+  def start_link(state \\ []) do
+    GenServer.start_link(__MODULE__, state, name: __MODULE__)
+  end
+
+  def init(state), do: {:ok, state}
+
+  def handle_call(:queue, _from, state) do
+    {:reply, state, state}
+  end
+
+  def handle_cast({:enqueue, item}, state) do
+    {:noreply, [item] ++ state}
+  end
+
+  def handle_call(:dequeue, _from, [first | rest]) do
+    {:reply, first, rest}
+  end
+
+  def handle_call(:dequeue, _from, []) do
+    {:reply, nil, []}
+  end
+
+  def queue, do: GenServer.call(__MODULE__, :queue)
+  def dequeue, do: GenServer.call(__MODULE__, :dequeue)
+  def enqueue(item), do: GenServer.cast(__MODULE__, {:enqueue, item})
+end
+```
+
+```elixir
+{:ok, pid} = SimpleQueue.start_link([1, 2, 3, 4])
+```
+
+```elixir
+SimpleQueue.queue()
+```
+
+```elixir
+SimpleQueue.enqueue(12)
+```
+
+```elixir
+Process.exit(pid, :kill)
+```

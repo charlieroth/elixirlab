@@ -1,0 +1,474 @@
+# Elixir Basics
+
+## Lists
+
+```elixir
+l = [3.14, :pie, "Apple"]
+```
+
+```elixir
+l = ["pi" | l]
+```
+
+```elixir
+l = l ++ ["Cherry"]
+```
+
+```elixir
+l = l -- ["Apple"]
+```
+
+```elixir
+lhd = l |> hd
+```
+
+```elixir
+ltl = l |> tl
+```
+
+## Tuples
+
+```elixir
+t = {3.14, :pie, "Apple"}
+```
+
+```elixir
+{:ok, file_contents} = File.read("/Users/charlie/github.com/charlieroth/elixilab/data.txt")
+file_contents
+```
+
+## Keyword Lists
+
+Characteristics of keyword lists:
+
+* Keys are `atoms`
+* Keys are *ordered*
+* Keys do not have to be unique
+
+These characteristics make keyword lists most commonly used to pass options to functions
+
+```elixir
+kl = [foo: "bar", hello: "world"]
+```
+
+## Maps
+
+```elixir
+m = %{:foo => "bar", :hello => "world"}
+```
+
+```elixir
+some_key = "bar"
+%{some_key => "baz"}
+```
+
+Duplicates are replaced by the former value
+
+```elixir
+m = %{:foo => "bar", :foo => "baz"}
+m.foo
+```
+
+Map update syntax
+
+Only works for updating a key that already exists in the map. If the key does not exist, a `KeyError` will be raised
+
+A new key can be created with `Map.put/3`
+
+```elixir
+m = %{foo: "bar", hello: "world"}
+m = %{m | foo: "baz"}
+```
+
+```elixir
+%{m | new_key: "new_value"}
+```
+
+```elixir
+Map.put(m, :new_key, "new_value")
+```
+
+## Enum
+
+The `Enum` module is used to work with enumerables with over 70 functions
+
+```elixir
+enumerable = ["foo", "bar", "hello"]
+```
+
+`all?/2`
+
+```elixir
+Enum.all?(enumerable, fn item ->
+  String.length(item) == 3
+end)
+```
+
+```elixir
+Enum.all?(enumerable, fn item ->
+  String.length(item) > 1
+end)
+```
+
+`any?/2`
+
+```elixir
+Enum.any?(enumerable, fn item ->
+  String.length(item) == 3
+end)
+```
+
+`chunk_every/2`
+
+```elixir
+Enum.chunk_every([1, 2, 3, 4, 5, 6, 7, 8], 2)
+```
+
+`map/2`
+
+```elixir
+Enum.map([1, 2, 3, 4, 5, 6, 7, 8], fn n ->
+  n * n
+end)
+```
+
+`map_every/3`
+
+```elixir
+Enum.map_every([1, 2, 3, 4, 5, 6, 7, 8], 2, fn n ->
+  n * n
+end)
+```
+
+`each/2`
+
+```elixir
+Enum.each(["charles", "thomas", "roth"], fn s ->
+  IO.puts(s)
+end)
+```
+
+`filter/2`
+
+```elixir
+Enum.filter([1, 2, 3, 4, 5], fn n ->
+  rem(n, 2) == 0
+end)
+```
+
+`Enum` using the *capture operator* `&`
+
+```elixir
+Enum.map([1, 2, 3, 4, 5], &(&1 * &1))
+```
+
+```elixir
+defmodule MathOps do
+  def square(num), do: num * num
+end
+
+{
+  Enum.map([1, 2, 3, 4, 5], &MathOps.square(&1)),
+  Enum.map([1, 2, 3, 4, 5], &MathOps.square/1)
+}
+```
+
+## Pattern Matching
+
+Pattern matching is a powerful feature of the Elixir language that allows a developer to match simple values, data structures and functions
+
+<!-- livebook:{"break_markdown":true} -->
+
+#### Match Operator
+
+In Elixir, the `=` operator is actually a *match operator*, comparable to the equals sign in Algebra
+
+```elixir
+x = 1
+```
+
+```elixir
+1 = x
+```
+
+```elixir
+2 = x
+```
+
+```elixir
+{:ok, msg} = {:ok, "success!"}
+```
+
+```elixir
+msg
+```
+
+```elixir
+{:ok, msg} = {:error, "some error message"}
+```
+
+#### Pin Operator `^`
+
+In some cases where variable rebinding behavior is undesirable, we actually want to use the *pin operator* `^`. This will use the literal value that is stored in the variable that is being operated on by the `^` pin operator
+
+```elixir
+x = 1
+```
+
+```elixir
+^x = 2
+```
+
+```elixir
+{x, ^x} = {2, 1}
+```
+
+```elixir
+x
+```
+
+```elixir
+key = "hello"
+```
+
+```elixir
+%{^key => value} = %{"hello" => "world"}
+```
+
+```elixir
+value
+```
+
+```elixir
+%{^key => value} = %{:hello => "world"}
+```
+
+```elixir
+greeting = "Hello"
+
+greet_fn = fn
+  ^greeting, name -> "Hi, #{name}"
+  greeting, name -> "#{greeting}, #{name}"
+end
+```
+
+```elixir
+{
+  greet_fn.("Hello", "Charlie"),
+  greet_fn.("God morgon", "Charlie")
+}
+```
+
+## Control Structures
+
+#### `if` and `unless`
+
+In Elixir, everything is a function. Including typical control flow operators such as `if`, `else`, etc.
+
+```elixir
+name = "Charlie"
+
+if String.valid?(name) do
+  IO.puts("#{name} is valid")
+else
+  IO.puts("#{name} is not valid")
+end
+```
+
+```elixir
+value = "some string"
+
+unless is_integer(value) do
+  IO.puts("#{value} is not an integer")
+end
+```
+
+```elixir
+result = {:ok, "open file succeeded"}
+
+case result do
+  {:ok, msg} -> "received a message: #{msg}"
+  {:error, msg} -> "received an error: #{msg}"
+  _ -> "catch all"
+end
+```
+
+```elixir
+pie = 3.14
+
+case "Cherry pie" do
+  ^pie -> "Numbers are not so tasty"
+  pie -> "#{pie}, yummy"
+end
+```
+
+```elixir
+user = %{first: "Charlie", last: "Roth"}
+
+with {:ok, first} <- Map.fetch(user, :first),
+     {:ok, last} <- Map.fetch(user, :last) do
+  last <> ", " <> first
+end
+```
+
+## Pipe Operator
+
+The *pipe operator* `|>` passes the result of an expression as the first parameter of another expression
+
+This allows you to refactor a snippet of code like:
+
+```
+foo(bar(baz(some_other_fn(other_fn()))))
+```
+
+To a snippet like:
+
+```
+other_fn |> some_other_fn |> baz |> bar |> foo
+```
+
+```elixir
+"Charles Thomas Roth III" |> String.split()
+```
+
+```elixir
+"charles thomas roth III" |> String.upcase() |> String.split()
+```
+
+## Modules
+
+Modules allow developers to:
+
+* Organize functions into a namespace
+* Define *named* and *private* functions
+
+#### Module Attributes
+
+Most commonly used as *constants* in Elixir
+
+Defined using the `@` operator
+
+Reserved attributes in Elixir:
+
+* `moduledoc` - documents the current module
+* `doc` - documentation for functions and macros
+* `behaviour` - use an OTP or user-defined behaviour
+
+```elixir
+defmodule Example.Greeter do
+  @default_greeting "Hello"
+
+  def greet(name) do
+    "#{@default_greeting}, #{name}"
+  end
+
+  def morning(name) do
+    "Good morning, #{name}"
+  end
+
+  def evening(name) do
+    "Good evening, #{name}"
+  end
+end
+```
+
+```elixir
+Example.Greeter.greet("Charlie")
+```
+
+## Structs
+
+Special maps with a defined set of keys and default values
+
+Must be defined within a module, which it takes its name from
+
+```elixir
+defmodule Example.User do
+  defstruct name: "Charlie", roles: []
+end
+```
+
+```elixir
+%Example.User{}
+```
+
+```elixir
+%Example.User{name: "Charles"}
+```
+
+```elixir
+%Example.User{name: "Charlie", roles: [:engineer]}
+```
+
+#### Module Composition
+
+<!-- livebook:{"break_markdown":true} -->
+
+The `alias` operator allows developers to alias module names
+
+When there is a conflict between two aliases or if a developer wants to alias a module to a different name, the `:as` option can be used
+
+The `import` operator imports functions into the scope of the module it is used in. This is used instead of aliasing a module, to allow for direct use of the imported functions
+
+The `require` operator tells Elixir you are going to use macros from another module. The `require` operator only allows macros, and not functions, from another module
+
+The `use` macro, you can enable another module to modify the current module definition. When the `use` macro is used, you are actually invoking the `__using__/1` callback defined by the provided module
+
+#### Metaprogramming
+
+The `quote`, `alias`, `use` and `require` macros are related to *metaprogramming*
+
+```elixir
+defmodule Sayings.Greetings do
+  def basic(name), do: "Hi, #{name}"
+end
+```
+
+```elixir
+defmodule Sayings.Farewells do
+  def basic(name), do: "Goodbye, #{name}"
+end
+```
+
+```elixir
+defmodule Example do
+  alias Sayings.Greetings
+  alias Sayings.Farewells, as: Bye
+
+  def greeting(name), do: Greetings.basic(name)
+  def farewell(name), do: Bye.basic(name)
+end
+```
+
+```elixir
+import List
+last([1, 2, 3])
+```
+
+## Comprehensions
+
+Comprehensions are used to produce more concise expressions for `Enum` and `Stream` iteration
+
+```elixir
+l = [1, 2, 3, 4, 5]
+for x <- l, do: x * x
+```
+
+```elixir
+kwl = [one: 1, two: 2, three: 3]
+for {_key, val} <- kwl, do: val
+```
+
+```elixir
+m = %{"one" => 1, "two" => 2, "three" => 3}
+for {key, val} <- m, do: {key, val}
+```
+
+```elixir
+# multiple comprehensions
+l = [1, 2, 3, 4, 5]
+
+for n <- l, times <- 1..n do
+  String.duplicate("*", times)
+end
+```
