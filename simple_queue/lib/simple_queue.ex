@@ -35,7 +35,7 @@ defmodule SimpleQueue do
   end
 
   def handle_call(:dequeue, _from, [item | state]) do
-   {:reply, item, state}
+    {:reply, item, state}
   end
 
   def handle_call(:dequeue, _from, []) do
