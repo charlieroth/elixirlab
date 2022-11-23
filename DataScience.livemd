@@ -1,0 +1,131 @@
+# Data Science
+
+```elixir
+Mix.install([
+  {:explorer, "~> 0.3.1"},
+  {:kino, "~> 0.4.1"}
+])
+```
+
+## Setup
+
+```elixir
+alias Explorer.DataFrame
+alias Explorer.Series
+```
+
+## Explorer - Dataframe library
+
+### Reading and Writing Data
+
+```elixir
+# TODO
+```
+
+### Working with Series
+
+`Explorer` works with a concept of `Series` which can be thought of in the same way as `vectors` in R or `series` in Pandas
+
+`Explorer` has the following `dtypes`:
+
+* `:float`
+* `:integer`
+* `:boolean`
+* `:string`
+* `:date` - unwraps `Elixir.Date`
+* `:datetime` - unwraps `Elixir.NativeDateTime`
+
+```elixir
+s1 = Series.from_list([1, 2, 3, 4])
+```
+
+```elixir
+s2 = Series.from_list(["a", "b", "c", "d"])
+```
+
+```elixir
+s3 = Series.from_list([~D[2022-11-22], ~D[1970-01-01]])
+```
+
+```elixir
+1..100 |> Enum.to_list() |> Series.from_list()
+```
+
+```elixir
+s4 = Series.from_list([1.0, 2.0, nil, nil, 5.0])
+```
+
+```elixir
+Series.fill_missing(s4, :forward)
+```
+
+```elixir
+Series.from_list([1, 2.0])
+```
+
+```elixir
+Series.from_list([1, 2, 3, "a"])
+```
+
+```elixir
+s = 1..10 |> Enum.to_list() |> Series.from_list()
+```
+
+`Series` implement the `Access` protocol so you can slice and dice in many ways
+
+```elixir
+s[1]
+```
+
+```elixir
+s[-1]
+```
+
+```elixir
+s[0..4]
+```
+
+```elixir
+s[[0, 4, 4]]
+```
+
+Convert back to an Elixir `List`
+
+```elixir
+Series.to_list(s)
+```
+
+```elixir
+s = 1..11 |> Enum.to_list() |> Series.from_list()
+s1 = 11..1 |> Enum.to_list() |> Series.from_list()
+```
+
+```elixir
+Series.equal(s, s1)
+```
+
+```elixir
+Series.equal(s, 5)
+```
+
+```elixir
+Series.not_equal(s, 10)
+```
+
+```elixir
+Series.add(s, s1)
+```
+
+```elixir
+Series.subtract(s, 4)
+```
+
+```elixir
+1..100 |> Enum.to_list() |> Enum.shuffle() |> Series.from_list() |> Series.sort()
+```
+
+### Working with DataFrames
+
+```elixir
+# TODO
+```

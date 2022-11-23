@@ -1,0 +1,72 @@
+# Advent Of Code Practice
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.7.0"}
+])
+```
+
+## Helpers
+
+```elixir
+defmodule Helpers do
+  def read_file(path) do
+    case File.read(path) do
+      {:ok, contents} -> contents
+      {:error, _} -> raise("Failed to read file")
+    end
+  end
+
+  def get_lines(file_contents) do
+    String.split(file_contents, "\n", trim: true)
+  end
+end
+```
+
+```elixir
+path_to_input = Kino.Input.text("Path to input file")
+```
+
+## Part 01
+
+```elixir
+Kino.Input.read(path_to_input)
+|> Helpers.read_file()
+|> Helpers.get_lines()
+|> Enum.map(&String.to_integer/1)
+|> Enum.filter(&is_integer/1)
+|> Enum.chunk_every(2, 1)
+|> Enum.reduce(0, fn pair, acc ->
+  if List.first(pair) < List.last(pair) do
+    acc + 1
+  else
+    acc
+  end
+end)
+|> (fn solution ->
+      IO.puts("Solution: #{solution}")
+    end).()
+```
+
+## Part 02
+
+```elixir
+Kino.Input.read(path_to_input)
+|> Helpers.read_file()
+|> Helpers.get_lines()
+|> Enum.map(&String.to_integer/1)
+|> Enum.filter(&is_integer/1)
+|> Enum.chunk_every(3, 1)
+|> Enum.map(fn w -> Enum.reduce(w, fn n, acc -> n + acc end) end)
+|> Enum.chunk_every(2, 1)
+|> Enum.reduce(0, fn pair, acc ->
+  if List.first(pair) < List.last(pair) do
+    acc + 1
+  else
+    acc
+  end
+end)
+|> (fn solution ->
+      IO.puts("Solution: #{solution}")
+    end).()
+```
