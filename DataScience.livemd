@@ -12,14 +12,33 @@ Mix.install([
 ```elixir
 alias Explorer.DataFrame
 alias Explorer.Series
+alias Explorer.Datasets
 ```
 
 ## Explorer - Dataframe library
 
 ### Reading and Writing Data
 
+<!-- livebook:{"break_markdown":true} -->
+
+Data can be read from CSV, NDJSON, Parquet and Arrow IPC formats
+
 ```elixir
-# TODO
+df = Datasets.fossil_fuels()
+```
+
+```elixir
+DataFrame.table(df)
+```
+
+```elixir
+input = Kino.Input.text("Filename")
+```
+
+```elixir
+filename = Kino.Input.read(input)
+full_path = "/Users/charlie/github.com/charlieroth/elixirlab/#{filename}"
+DataFrame.to_csv(df, full_path)
 ```
 
 ### Working with Series
@@ -126,6 +145,34 @@ Series.subtract(s, 4)
 
 ### Working with DataFrames
 
+<!-- livebook:{"break_markdown":true} -->
+
+[DataFrames: Explorer Docs](https://hexdocs.pm/explorer/exploring_explorer.html#working-with-dataframes)
+
+A `DataFrame` is a collection of `Series` of the same size
+
 ```elixir
-# TODO
+df = DataFrame.new(a: [1, 2, 3], b: ["a", "b", "c"])
+```
+
+```elixir
+DataFrame.names(df)
+```
+
+```elixir
+DataFrame.dtypes(df)
+```
+
+```elixir
+DataFrame.shape(df)
+```
+
+```elixir
+DataFrame.select(df, ["a"])
+```
+
+You can also execute a filtering callback on the column names
+
+```elixir
+DataFrame.select(df, &String.equivalent?(&1, "b"))
 ```
